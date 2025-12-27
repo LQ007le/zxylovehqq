@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>给我最爱的宝宝 💍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .page.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* 页面一：戒指盒子 */
+        #page1 {
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1e 100%);
+            cursor: pointer;
+            perspective: 1000px;
+        }
+
+        .ring-box-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            transform-style: preserve-3d;
+        }
+
+        .ring-box {
+            position: absolute;
+            width: 300px;
+            height: 200px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transform-style: preserve-3d;
+        }
+
+        .box-bottom {
+            position: absolute;
+            width: 300px;
+            height: 80px;
+            background: linear-gradient(145deg, #8B0000, #DC143C);
+            border-radius: 10px;
+            bottom: 0;
+            box-shadow: 0 20px 60px rgba(220, 20, 60, 0.6),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            border: 2px solid #FFD700;
+        }
+
+        .box-top {
+            position: absolute;
+            width: 300px;
+            height: 80px;
+            background: linear-gradient(145deg, #A00000, #FF1744);
+            border-radius: 10px;
+            bottom: 70px;
+            transform-origin: bottom;
+            transition: transform 2s ease;
+            box-shadow: 0 10px 40px rgba(255, 23, 68, 0.5),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            border: 2px solid #FFD700;
+        }
+
+        .box-top::before {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 15px;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.6);
+        }
+
+        .ring-box.opened .box-top {
+            transform: rotateX(-120deg);
+        }
+
+        .ring-container {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            left: 50%;
+            bottom: 80px;
+            transform: translateX(-50%) translateY(50px);
+            opacity: 0;
+            transition: all 2s ease 0.5s;
+        }
+
+        .ring-box.opened .ring-container {
+            transform: translateX(-50%) translateY(-30px);
+            opacity: 1;
+        }
+
+        .ring {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            animation: float 3s ease-in-out infinite, rotate 8s linear infinite;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        .click-hint {
+            position: absolute;
+            bottom: 50px;
+            color: white;
+            font-size: 18px;
+            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* 页面二：祝福页面 */
+        #page2 {
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        #page2::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .message-box {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 60px 50px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            animation: slideIn 1s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .main-message {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #FF6B6B, #FF1744, #F50057);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sub-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .love-button {
+            background: linear-gradient(135deg, #FF6B6B, #FF1744);
+            color: white;
+            border: none;
+            padding: 18px 60px;
+            font-size: 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 23, 68, 0.4);
+            font-weight: bold;
+        }
+
+        .love-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 23, 68, 0.6);
+        }
+
+        /* 页面三：情书 */
+        #page3 {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 50%, #FFD166 100%);
+            position: relative;
+            overflow: auto;
+        }
+
+        .hearts-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 40px;
+            color: rgba(255, 255, 255, 0.6);
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .letter-container {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            background: white;
+            margin: 50px auto;
+            padding: 60px;
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            animation: letterOpen 1.5s ease;
+        }
+
+        @keyframes letterOpen {
+            from { 
+                transform: scale(0.8) rotateX(-10deg); 
+                opacity: 0; 
+            }
+            to { 
+                transform: scale(1) rotateX(0); 
+                opacity: 1; 
+            }
+        }
+
+        .letter-header {
+            font-size: 28px;
+            color: #FF1744;
+            margin-bottom: 30px;
+            font-weight: bold;
+            border-bottom: 3px solid #FF6B6B;
+            padding-bottom: 15px;
+        }
+
+        .letter-content {
+            font-size: 18px;
+            line-height: 2;
+            color: #333;
+            text-align: justify;
+            text-indent: 2em;
+        }
+
+        .letter-content p {
+            margin-bottom: 20px;
+        }
+
+        .signature {
+            text-align: right;
+            margin-top: 40px;
+            font-size: 20px;
+            color: #FF1744;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面一：戒指盒子 -->
+    <div id="page1" class="page active">
+        <div class="ring-box-container">
+            <div class="ring-box" id="ringBox">
+                <div class="box-bottom"></div>
+                <div class="box-top"></div>
+                <div class="ring-container">
+                    <img src="saasnexusmultimodal2c84cda384963.jpg" alt="戒指" class="ring">
+                </div>
+            </div>
+        </div>
+        <div class="click-hint">✨ 点击屏幕打开惊喜 ✨</div>
+    </div>
+
+    <!-- 页面二：祝福页面 -->
+    <div id="page2" class="page">
+        <div class="message-box">
+            <div class="main-message">元旦快乐老婆~</div>
+            <div class="sub-message">礼物在路上~<br>取快递请call你宝宝</div>
+            <button class="love-button" onclick="showPage3()">我爱你 ❤️</button>
+        </div>
+    </div>
+
+    <!-- 页面三：情书 -->
+    <div id="page3" class="page">
+        <div class="hearts-bg" id="heartsBg"></div>
+        <div class="letter-container">
+            <div class="letter-header">TO：我最爱的宝宝</div>
+            <div class="letter-content">
+                <p>想不到吧你宝宝我就是如此浪漫。</p>
+                <p>元旦快乐呀！我们也是从2025走到了2026喽~ 新的一年希望继续有你的陪伴。</p>
+                <p>你还挺聪明的宝宝，让你选23就是在挑戒指哈哈哈。但是毕竟是惊喜，肯定不能让你提前知道嗯对。</p>
+                <p>忘不了追到你的时候太激动忘记同意这件事哈哈哈，不过没关系，直到现在你也依旧是我的~</p>
+                <p>爱你老婆，戴上戒指就彻底是我的人喽 💍</p>
+            </div>
+            <div class="signature">—— 永远爱你的宝宝</div>
+        </div>
+    </div>
+
+    <script>
+        // 页面一：戒指盒子动画
+        let page1Clicked = false;
+        document.getElementById('page1').addEventListener('click', function() {
+            if (!page1Clicked) {
+                page1Clicked = true;
+                document.getElementById('ringBox').classList.add('opened');
+                
+                // 添加闪光效果
+                for(let i = 0; i < 20; i++) {
+                    setTimeout(() => {
+                        const sparkle = document.createElement('div');
+                        sparkle.className = 'sparkle';
+                        sparkle.style.left = Math.random() * 100 + '%';
+                        sparkle.style.top = Math.random() * 100 + '%';
+                        sparkle.style.animationDelay = Math.random() * 1 + 's';
+                        document.querySelector('.ring-box-container').appendChild(sparkle);
+                    }, i * 100);
+                }
+                
+                setTimeout(() => {
+                    showPage2();
+                }, 3000);
+            }
+        });
+
+        function showPage2() {
+            document.getElementById('page1').classList.remove('active');
+            const page2 = document.getElementById('page2');
+            
+            // 设置背景图片
+            page2.style.backgroundImage = "url('saasnexusmultimodal7ad718e0235056.jpg')";
+            
+            setTimeout(() => {
+                page2.classList.add('active');
+            }, 100);
+        }
+
+        function showPage3() {
+            document.getElementById('page2').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('page3').classList.add('active');
+                createHearts();
+            }, 100);
+        }
+
+        // 创建飘落的爱心
+        function createHearts() {
+            const heartsBg = document.getElementById('heartsBg');
+            for(let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    heart.innerHTML = '❤️';
+                    heart.style.left = Math.random() * 100 + '%';
+                    heart.style.animationDuration = (Math.random() * 3 + 5) + 's';
+                    heart.style.animationDelay = Math.random() * 2 + 's';
+                    heartsBg.appendChild(heart);
+                }, i * 300);
+            }
+        }
+    </script>
+</body>
+</html>
